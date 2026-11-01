@@ -22,6 +22,7 @@ module ex_stage (
     output logic [31:0] alu_out,
     output logic [31:0] pc_ex_out      // branch / jump target
 );
+aa
 ```
 
 ### Working
