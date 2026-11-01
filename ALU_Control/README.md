@@ -5,13 +5,56 @@ Design the ALU control decoder. It turns the operation class from Main Control, 
 ### Module Specification
 
 ```SystemVerilog
-module alu_control (
-    input  logic [2:0] alu_op,        // operation class from main_control
+module ALU_Ctrl (
+    input  logic [2:0] aluop,
     input  logic [2:0] fn3,
-    input  logic [6:0] imm11_5,       // instruction[31:25]: shift qualifier (I-type)
-    input  logic       fn7_5,         // instruction[30]: SUB / SRA qualifier (R-type)
-    output logic [4:0] control_out
+    input  logic       fn7_5,
+    output logic [3:0] alu_control
 );
+
+    always_comb begin
+        case (aluop)
+
+            3'b000: begin  // R-type
+                case (fn3)
+                    3'b000: alu_control = fn7_5 ? 4'b0001 : 4'b0000;
+                    3'b001: alu_control = 4'b0101;
+                    3'b010: alu_control = 4'b1000;
+                    3'b011: alu_control = 4'b1001;
+                    3'b100: alu_control = 4'b0100;
+                    3'b101: alu_control = fn7_5 ? 4'b0111 : 4'b0110;
+                    3'b110: alu_control = 4'b0011;
+                    3'b111: alu_control = 4'b0010;
+                    default: alu_control = 4'b0000;
+                endcase
+            end
+
+            3'b001: begin  // I-type ALU operations
+                case (fn3)
+                    3'b000: alu_control = 4'b0000; // ADDI
+                    3'b010: alu_control = 4'b1000; // SLTI
+                    3'b011: alu_control = 4'b1001; // SLTIU
+                    3'b100: alu_control = 4'b0100; // XORI
+                    3'b110: alu_control = 4'b0011; // ORI
+                    3'b111: alu_control = 4'b0010; // ANDI
+                    3'b001: alu_control = 4'b0101; // SLLI
+                    3'b101: alu_control = fn7_5 ? 4'b0111 : 4'b0110;
+                    default: alu_control = 4'b0000;
+                endcase
+            end
+
+            3'b010: alu_control = 4'b0000; // Load: address calculation
+            3'b011: alu_control = 4'b0000; // Store: address calculation
+            3'b100: alu_control = 4'b0001; // Branch: subtraction
+            3'b101: alu_control = 4'b0000; // JAL/JALR address calculation
+            3'b110: alu_control = 4'b1010; // LUI: pass B
+
+            default: alu_control = 4'b0000;
+
+        endcase
+    end
+
+endmodule
 ```
 
 ### Working
