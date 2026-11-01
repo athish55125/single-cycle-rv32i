@@ -5,13 +5,58 @@ Design a 32-bit Arithmetic Logic Unit (ALU) with 16 operations, including the br
 ### Module Specification
 
 ```SystemVerilog
-module alu #(parameter int DATA_WIDTH = 32)(
-    input  logic [4:0]            alu_control,
-    input  logic [DATA_WIDTH-1:0] rs1_data,
-    input  logic [DATA_WIDTH-1:0] rs2_data,
-    output logic [DATA_WIDTH-1:0] alu_out,
-    output logic                  zero          // branch condition true
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 29.10.2026 14:04:06
+// Design Name: 
+// Module Name: ALU
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module ALU (
+    input  logic [31:0] A,
+    input  logic [31:0] B,
+    input  logic [3:0]  ALU_Control,
+    output logic [31:0] Result,
+    output logic        Zero
 );
+
+    always_comb begin
+        case (ALU_Control)
+
+            4'b0000: Result = A + B;                    // ADD
+            4'b0001: Result = A - B;                    // SUB
+            4'b0010: Result = A & B;                    // AND
+            4'b0011: Result = A | B;                    // OR
+            4'b0100: Result = A ^ B;                    // XOR
+            4'b0101: Result = A << B[4:0];              // SLL
+            4'b0110: Result = A >> B[4:0];              // SRL
+            4'b0111: Result = $signed(A) >>> B[4:0];     // SRA
+            4'b1000: Result = ($signed(A) < $signed(B)) ? 32'd1 : 32'd0;
+            4'b1001: Result = (A < B) ? 32'd1 : 32'd0;
+            4'b1010: Result = B;                        // Pass B
+            default: Result = 32'd0;
+
+        endcase
+
+        Zero = (Result == 32'd0);
+    end
+
+endmodule
 ```
 
 ### ALU Control Table
