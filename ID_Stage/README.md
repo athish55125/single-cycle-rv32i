@@ -5,27 +5,95 @@ Design the decode stage by connecting the **Decoder**, **Immediate Generator**, 
 ### Module Specification
 
 ```SystemVerilog
-module id_stage(
-    input  logic        clk,
-    input  logic        reset,
-    input  logic        stall,
-    input  logic [31:0] instruction,
-    input  logic [31:0] wb_data,        // data to write back (from the WB stage)
+module ID_stage (
+    input logic clk,
+    input logic reset,
+
+    input logic [31:0] instruction,
+
+    // Writeback inputs from later pipeline stages
+    input logic [4:0] wb_rd_sel,
+    input logic [31:0] wb_data,
+    input logic wb_reg_write,
+
+    // Register file outputs
     output logic [31:0] rs1_data,
     output logic [31:0] rs2_data,
-    output logic [31:0] imm_out,
-    output logic [6:0]  opcode_out_d,
-    output logic [6:0]  imm11_5,
-    output logic [2:0]  fn3_out_d,
-    output logic        fn7_5,
-    output logic [2:0]  aluop,
-    output logic [1:0]  memtoreg,
-    output logic        branch,
-    output logic        mem_write,
-    output logic        mem_read,
-    output logic        alu_src,
-    output logic        mux_inp
+
+    // Decoded fields
+    output logic [4:0] rs1,
+    output logic [4:0] rs2,
+    output logic [4:0] rd,
+    output logic [31:0] imm_output,
+
+    // Control signals
+    output logic branch,
+    output logic mux_inp,
+    output logic memread,
+    output logic [1:0] memtoreg,
+    output logic memwrite,
+    output logic alusrc,
+    output logic reg_write,
+    output logic [2:0] aluop
 );
+
+    logic [6:0] opcode;
+    logic [6:0] imm11_5;
+    logic [2:0] fn3;
+    logic [11:0] imm;
+    logic [19:0] imm_ui;
+    logic fn7_5;
+
+    // 1. Instruction Decoder
+    decoder D1 (
+        .instruction(instruction),
+        .rs1(rs1),
+        .rs2(rs2),
+        .rd(rd),
+        .opcode(opcode),
+        .imm11_5(imm11_5),
+        .fn3(fn3),
+        .imm(imm),
+        .imm_ui(imm_ui),
+        .fn7_5(fn7_5)
+    );
+
+    // 2. Register File
+    register R1 (
+        .clk(clk),
+        .reset(reset),
+        .rs1_sel(rs1),
+        .rs2_sel(rs2),
+        .rd_sel(wb_rd_sel),
+        .wb_data(wb_data),
+        .reg_write(wb_reg_write),
+        .rs1_data(rs1_data),
+        .rs2_data(rs2_data)
+    );
+
+    // 3. Immediate Generator
+    Imm_Gen I1 (
+        .imm_input(imm),
+        .imm_output(imm_output),
+        .opcode(opcode),
+        .imm_input_uj(imm_ui),
+        .fn3(fn3)
+    );
+
+    // 4. Control Unit
+    control_unit C1 (
+        .opcode(opcode),
+        .branch(branch),
+        .mux_inp(mux_inp),
+        .memread(memread),
+        .memtoreg(memtoreg),
+        .memwrite(memwrite),
+        .alusrc(alusrc),
+        .reg_write(reg_write),
+        .aluop(aluop)
+    );
+
+endmodule
 ```
 
 ### Working
