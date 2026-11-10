@@ -16,19 +16,6 @@ module register(
     output logic[31:0] rs1_data,
     output logic[31:0] rs2_data
     );
-logic [31:0] regs [0:31];
-assign rs1_data =(rs1_sel==5'd0)?32'd0:regs[rs1_sel];
-assign rs2_data =(rs2_sel==5'd0)?32'd0:regs[rs2_sel];
-always_ff @(posedge clk or posedge reset) begin
-if (reset) begin
-        for (int i=0;i<32;i=i+1)
-            regs[i] <= 32'd0;
-            end
- else if (reg_write&&(rd_sel!=5'd0)) begin
-        regs[rd_sel] <= wb_data;
-    end
-end
-endmodule
 
 ```
 
