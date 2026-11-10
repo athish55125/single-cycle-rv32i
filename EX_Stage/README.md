@@ -23,58 +23,6 @@ module EX_Stage (
     output logic [31:0] pc_target
 );
 
-    logic [31:0] alu_b;
-    logic [3:0]  alu_control;
-    logic [31:0] pc_plus_imm;
-
-    // 1. ALU control
-    ALU_Ctrl ac (
-        .aluop(aluop),
-        .fn3(fn3),
-        .fn7_5(fn7_5),
-        .alu_control(alu_control)
-    );
-
-    // 2. Select second ALU operand
-    MUX21 mux_ex (
-        .a(rs2_data),
-        .b(imm_output),
-        .sel(alusrc),
-        .y(alu_b)
-    );
-
-    // 3. ALU
-    ALU alu1 (
-        .A(rs1_data),
-        .B(alu_b),
-        .ALU_Control(alu_control),
-        .Result(alu_result),
-        .Zero(zero)
-    );
-
-    // 4. Branch decision
-    AND_Gate and_ex (
-        .branch(branch),
-        .zero(zero),
-        .and_out(and_out)
-    );
-
-    // 5. Calculate PC + immediate
-    IF_Adder ex_add (
-        .pc(pc),
-        .imm(imm_output),
-        .pc_target(pc_plus_imm)
-    );
-
-    // 6. Select next PC target
-    MUX21 mux_pc (
-        .a(pc + 32'd4),
-        .b(pc_plus_imm),
-        .sel(and_out | mux_inp),
-        .y(pc_target)
-    );
-
-endmodule
 ```
 
 ### Working
