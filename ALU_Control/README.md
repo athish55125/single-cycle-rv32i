@@ -5,11 +5,12 @@ Design the ALU control decoder. It turns the operation class from Main Control, 
 ### Module Specification
 
 ```SystemVerilog
-module ALU_Ctrl (
-    input  logic [2:0] aluop,
+module alu_control (
+    input  logic [2:0] alu_op,        // operation class from main_control
     input  logic [2:0] fn3,
-    input  logic       fn7_5,
-    output logic [3:0] alu_control
+    input  logic [6:0] imm11_5,       // instruction[31:25]: shift qualifier (I-type)
+    input  logic       fn7_5,         // instruction[30]: SUB / SRA qualifier (R-type)
+    output logic [4:0] control_out
 );
 ```
 
