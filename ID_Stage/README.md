@@ -43,57 +43,6 @@ module ID_stage (
     logic [11:0] imm;
     logic [19:0] imm_ui;
     logic fn7_5;
-
-    // 1. Instruction Decoder
-    decoder D1 (
-        .instruction(instruction),
-        .rs1(rs1),
-        .rs2(rs2),
-        .rd(rd),
-        .opcode(opcode),
-        .imm11_5(imm11_5),
-        .fn3(fn3),
-        .imm(imm),
-        .imm_ui(imm_ui),
-        .fn7_5(fn7_5)
-    );
-
-    // 2. Register File
-    register R1 (
-        .clk(clk),
-        .reset(reset),
-        .rs1_sel(rs1),
-        .rs2_sel(rs2),
-        .rd_sel(wb_rd_sel),
-        .wb_data(wb_data),
-        .reg_write(wb_reg_write),
-        .rs1_data(rs1_data),
-        .rs2_data(rs2_data)
-    );
-
-    // 3. Immediate Generator
-    Imm_Gen I1 (
-        .imm_input(imm),
-        .imm_output(imm_output),
-        .opcode(opcode),
-        .imm_input_uj(imm_ui),
-        .fn3(fn3)
-    );
-
-    // 4. Control Unit
-    control_unit C1 (
-        .opcode(opcode),
-        .branch(branch),
-        .mux_inp(mux_inp),
-        .memread(memread),
-        .memtoreg(memtoreg),
-        .memwrite(memwrite),
-        .alusrc(alusrc),
-        .reg_write(reg_write),
-        .aluop(aluop)
-    );
-
-endmodule
 ```
 
 ### Working
